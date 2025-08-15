@@ -125,6 +125,57 @@ To get the cluster information, status of other nodes in the cluster, few comman
 -> kubectl cluster-info
 -> kubectl get nodes
 
+CRI  - Container runtime interface
+
+-  It is an API that enables a container runtime with other vendors like Rkt, Containerd etc., but by default it is docker.
+-  The CRI defines the gRPC protocol that the Kubernetes Kubelet users o interact with container runtimes
+- Dockershim as introduced to bypass CRI and work with kubernestes to continue work with Docker images.
+
+Docker vs ContainerD
+
+- Initially Docker is the only container which is more popularly used.
+- Later Kubernetes came into picture and started orchestrating Docker even though there are containers like rkt etc.,
+- But users came forward stating they wanted to use other containers as well. So Container Runtime Interface (CRI) was introduced which allows Kubernetes to interact and work with non docker containers. But these non docker container should be inline with OCI (Open Container Initiative standards.
+- Basically OCI consists imagespec and runtimespec
+- imagespec defines on how images specifically build.
+- runtimespec defines the any container runtime specifications are developed
+
+
+POD
+
+- Kubernetes does not install application(container) directly on a workernode
+- Application is installed on a POD
+- Pod is smallest unit in Kubernetes
+- In a single Pod we can have multiple containers but multiple containers should be not same kind.
+- Helper containers - At times, we might need another container called helper container to process some user data or file etc.,
+- If a container fails then helper container will also deleted.
+- container and helper container will communicate via network thru local host and also shares same storage. 
+
+Installing Kind (Kubernetes IN Docker) on Linux VM
+
+- Command to download latest Kind version 
+-> curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+
+- Command to make binary executable
+-> chmod +x ./kind
+
+- Command to move your system PATH
+-> mv ./kind /usr/local/bin/kind
+
+- Command to verify Kind Installation
+-> kind version
+
+- Command to install a Cluster in kind
+-> kind create cluster
+
+- Command to install Kubectl
+-> snap install kubectl --classic
+
+- Command to get "kind" cluster info
+-> kubectl cluster-info --context kind-kind
+
+- Command to get Nodes in the Kind cluster
+-> kubectl get nodes
 
 
 
