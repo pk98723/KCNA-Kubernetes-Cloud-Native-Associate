@@ -177,6 +177,17 @@ Installing Kind (Kubernetes IN Docker) on Linux VM
 - Command to get Nodes in the Kind cluster
 -> kubectl get nodes
 
+- Command to create a image on a pod
+-> kubectl run nginx --image=nginx
+
+- Command to know the running pod details
+-> kubectl get pod
+
+- Command to describe pod details
+-> kubectl describe pod
+
+- Command to know more details of running pod
+-> Kubeclt det pod -o wide
 
 
 
