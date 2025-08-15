@@ -18,3 +18,36 @@ How to solve
 Operating System
 - Lets say we have differnt OS like Fedora, SUSE, Ubuntu or CentOS all consist of 2 things a set of softwares and OS Kernel.
 - The OS kernel is responsible for interacting with underlying Hardware while the OS kernel remains the same like Linux the softwares above it will make the OS different.
+
+Sharing the Kernel
+- We can run Docker with OS hosted on it with one underlying OS Kernel.
+Ex: I have one OS with Ubuntu as base and on it i have hosted Docker. On this docker we can run mutlitple Linux OS systems like Suse, Fedora etc.,
+- But we cannot run Windows OS on the same Docker as the underlying OS is Linux. For this we need Docker on Windows OS.
+- Docker is not meant to run mutliple OS on the same hardware. 
+- The main purpose of the Docker is to containerize them and to ship them & run.
+
+Container vs Virtual machines
+
+Containers
+- On one docker we can run multiple container so that means utilization will be less w.r.t CPU & MEM.
+- The space occupied per container will be less and when booting up it will be fast and quick.
+
+Virtual machines
+- On one Hypervisor, we can run multiple OS and multiple virtual machines so it means utilization will be more w.r.t CPU & MEM.
+- The space occupied per VM on the Hardware infra will be more compared to container and when booting up it will be slow compared with containers.
+
+How is it done?
+- To run any application on the docker like ansible, mongodb, redis, nodejs you need to simply run
+
+docker run ansible
+docker run mongodb
+etc
+
+Container vs image
+- From an image, containers will be build. In simple words image is a package template.
+- We can create own own image and make it available to public to use.
+
+Container Advantage
+- Developer will create a docker file and share it with operations team to use it.
+- Previously when there was no docker image, developers use to give a setup file along with it a document on how to run it and at times to fix any issues or if any issues are faced during installation often Developers are contacted by operations team to fix the issue which is time taking process.
+
