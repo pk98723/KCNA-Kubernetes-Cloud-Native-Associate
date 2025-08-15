@@ -75,3 +75,57 @@ Kuberneste Advantages
 - Highly Available
 - User traffic is maintained by loadbalancer
 - Nodes will be created and destroyed on demand based on the declarative object oriented file
+
+Kubernetes Architecture
+
+Node: (minions)
+- Is a machine physical or virtual on which Kubernetes is installed.
+Cluster:
+- A group of Nodes is called Cluster
+- When a node fails other node will take and manage load of the application
+Master:
+- Master manages a cluster like moving a failed nodes load onto worker node
+- It is responsible of actual orchestration on Kubernetes
+
+Components:
+
+- API Server
+  Frontend for Kubernetes
+  All talk to API server for communication
+- etcd
+  Its Key-Value store
+  It is responsible for implementing logs between cluster
+- Kubelet
+  It is an agent which runs on each node/cluster
+  It is responsible to make sure containers are running on nodes as expected
+- Container runtime
+  It is the underlying softwares to run containers
+  Ex: Docker
+- Controller
+  The brain behind orchestration
+  It makes decision to bring up the container/nodes goes down
+- Scheduler
+  Responsible for distributing work or containers across multiple nodes
+  It will find the new/idle containers and assign to nodes
+
+Master vs Worker Nodes
+
+In Master we have Kube-apiserver which will in in communication with Kubelet on the worker
+All the data received from kubelet to kube-apiserver will be stored in etcd in key-value format
+Along with kube-apiserver, etcd a master node has Controller and Scheduler on it.
+In worker node we have Container Runtime along with Kubelet. Generally Docker is the container runtime.
+
+Kubeclt
+
+It is a command line utility.
+
+To get the cluster information, status of other nodes in the cluster, few commands below
+
+-> kubectl run hello-minikube
+-> kubectl cluster-info
+-> kubectl get nodes
+
+
+
+
+
