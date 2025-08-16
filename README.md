@@ -321,5 +321,15 @@ spec:
 
 Ex: We have 10 Pods running, out of which we have 3 pods on which we would like to enable replicaset for HA. So in the code of Replicaset, we will specifically mention to pick the type mentioned in common from labels section to tie these 3 pods together. 
 
+- Command to edit any yaml file without going into VIM editor is 
+-> kubectl edit replicaset "replicaset yaml file name"
+-> kubectl edit pod "pod yaml file name"
+
+- Command to scale replicaset without editing configuration is
+kubectl scale replicaset "name of the replicaset" --replicas="give the number"
+
+
+
+
 
 
