@@ -60,6 +60,7 @@ Install Docker
 -> sude su
 - Once Root login is enabled install docker using below command
 -> apt-get install docker.io
+  
 NOTE: Incase you get below error then run -> "apt-get update" to get the latest packages then try to install docker.io
 
 
