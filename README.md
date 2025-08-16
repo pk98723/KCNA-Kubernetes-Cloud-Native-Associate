@@ -291,11 +291,11 @@ spec:
   replicas: 3
 
 -  Now run "kubectl apply -f rc-definition.yml"
-
+----------------------------------------------------------------
 Lets create a Yaml file to deploy replicaset with rs.definition.yml
 
-apiVersion: v1
-kind: ReplicationController
+apiVersion: apps/v1
+kind: ReplicaSet
 metadata:
   name: myapp-rc
   labels:
@@ -327,6 +327,42 @@ Ex: We have 10 Pods running, out of which we have 3 pods on which we would like 
 
 - Command to scale replicaset without editing configuration is
 kubectl scale replicaset "name of the replicaset" --replicas="give the number"
+
+Deployments
+- Deployment is an object higher in Kubernates in the hierarchy
+- Deployment provides the capability to upgrade the underlying instances seemeesly using rolling updates, undo changes, Pause and resume changes as required.
+
+Definition file:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-dp
+  labels:
+    app: myapp
+    type: frontend
+spec:
+  template:
+    metadata:
+      name: nginx1
+      labels:
+        app: nginx
+        tier: frontend
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+  replicas: 3
+  selector:
+    matchLabels:
+      type: front-end
+
+- Now run kubectl create -f deployment-definiation.yml to deploy the deployment.
+- If you want to see the recent deployments then run 
+->kubectl get deployments
+- If you want see the replicaset created due to deployments then run -> kubectl get replicaset
+- If you want to see the pods created due to deployments then run -> kubectl get pod
+- if you want to see all the services deployed due to deployment file/code then run -> kubectl get all
 
 
 
