@@ -203,4 +203,123 @@ Installing Kind (Kubernetes IN Docker) on Linux VM
 -> Kubeclt det pod -o wide
 
 
+POD with YAML
+
+YAML in Kubernetes
+- A structure of YAML contains 4 root level properties
+apiVersion
+kind
+metadata
+spec
+- apiVersion: is version of Kubernetes api used to create objects. Ex: apiVersion: v1
+Some example of apiVersion are
+POD - v1
+Service - v1
+ReplicaSet - apps/v1
+Deployment - apps/v1
+
+- kind: represents the type of object when we create. Ex: Pod/Service/ReplicaSet/Deployment
+
+- metadata is data about the object
+Ex:
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+    type: front-end
+
+- spec: is a dictonary
+Ex:
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
+
+Final Yaml:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod1
+  labels:
+    app: app1
+    type: front-end
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
+
+- In Linux console, type below command to create yaml file
+nano pod-definition.yml
+
+- Copy & paste or write the above yaml code in the file
+- Click ctl + o to save the file, hit enter
+- Click ctl + x to exit the editor
+
+- Using below command, we can build the pod
+
+kubectl create -f pod-definition.yml
+or
+kubectl apply -f pod-definition.yml
+
+
+ ReplicationController & ReplicaSets:
+
+- Helps to run application even if the one is pod is failed, immediately new pod will be deployed.
+- Also helps to load balances when existing pods are over utilized in a node and there is more demand then the load will be shared with another node where there is bandwidth.
+
+Lets create a Yaml file to deploy replication controller with rc.definition.yml
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: myapp-rc
+  labels:
+    app: myapp
+    type: frontend
+spec:
+  template:
+    metadata:
+      name: nginx1
+      labels:
+        app: nginx
+        tier: frontend
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+  replicas: 3
+
+-  Now run "kubectl apply -f rc-definition.yml"
+
+Lets create a Yaml file to deploy replicaset with rs.definition.yml
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: myapp-rc
+  labels:
+    app: myapp
+    type: frontend
+spec:
+  template:
+    metadata:
+      name: nginx1
+      labels:
+        app: nginx
+        tier: frontend
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+  replicas: 3
+  selector:
+    matchLabels:
+      type: front-end
+
+- Difference Between  ReplicationController and Replicaset is, in Replicaset yaml code, we will specifically mention Selector  column to match labels across all the targeted pods.
+
+Ex: We have 10 Pods running, out of which we have 3 pods on which we would like to enable replicaset for HA. So in the code of Replicaset, we will specifically mention to pick the type mentioned in common from labels section to tie these 3 pods together. 
+
+
 
