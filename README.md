@@ -365,6 +365,11 @@ spec:
 - if you want to see all the services deployed due to deployment file/code then run -> kubectl get all
 
 
+Rollout and Versioning
+
+-> Kubectl rollout status deployment/myapp-deployment
+
+-> Kubectl rollout history deployment/myapp-deployment
 
 
 
