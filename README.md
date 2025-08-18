@@ -414,3 +414,27 @@ Rollback:
 
 Imperative & Declarative
 
+Imperative def is to give step by steps instructions on what to do and how to do
+
+Declarative def is to provide declaring the final outcome and system will define how to achieve.
+
+
+Further more how infra as code is defined in both methods:
+
+Imperative
+
+Provision a vm by the name webserver
+Installed NGINX software on it
+Edit configuration file to use port 8080
+Edit configuration file to web path
+Load web pages to /nginx
+start NGINX server
+
+Declarative
+
+VM Name: web-server
+Package: nginx
+Port: 8080
+Path: /
+Code: GIT Repo - X
+Ex: Anible/Pupet/Chef/Terraform are Declarative examples
