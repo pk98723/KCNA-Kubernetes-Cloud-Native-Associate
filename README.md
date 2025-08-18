@@ -412,5 +412,5 @@ Rollback:
 - Using below command, the roll back will be smooth and without downtime one by one container will be rolled back.
 -> kubectl rollout undo deployment/"deployment name"
 
-
+Imperative & Declarative
 
