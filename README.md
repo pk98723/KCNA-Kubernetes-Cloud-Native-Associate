@@ -364,12 +364,26 @@ spec:
 - If you want to see the pods created due to deployments then run -> kubectl get pod
 - if you want to see all the services deployed due to deployment file/code then run -> kubectl get all
 
-
 Rollout and Versioning
 
+- To know the recent rollout status
 -> Kubectl rollout status deployment/myapp-deployment
 
+- To know the complete history of the rollout
 -> Kubectl rollout history deployment/myapp-deployment
+
+
+Two types od deployment strateoges
+
+1. Recreate strategy
+- Lets say we have 4 apps running on 4 containers, incase we need to upgrade app from V1 to V2 then all the V1's will be brought down at a time and then upgraded and replaced by V2.
+- In this strategy, there is application downtime.
+
+2. Rolling update Strategy
+- Lets say we have 4 apps running on the 4 containers, here the upgrades of the app happens one by one and there is very minimal downtime. 
+- Incase no strategy is selected then Rolling update strategy will be the default deployment strategy selected.
+
+
 
 
 
