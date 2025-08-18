@@ -384,6 +384,15 @@ Two types od deployment strateoges
 - Incase no strategy is selected then Rolling update strategy will be the default deployment strategy selected.
 
 
+How to update the app version upgrade:
+Two ways to do it
+1. Update the configuration file and run the below command
+-> kubectl apply -f deployment-definition.yaml
+- It means the deployment configuration file will be updated with latest app version and the deployment configuration will be updated.
+
+2. Update the app version on the runtime.
+-> kubectl set image deployment/"deployment name" \ nginx=nginx:V2.
+= It means the deployment configuration is updated but not the deployment definition file. Incase you run the deployment definiation file then old version will be returned.
 
 
 
