@@ -394,6 +394,23 @@ Two ways to do it
 -> kubectl set image deployment/"deployment name" \ nginx=nginx:V2.
 = It means the deployment configuration is updated but not the deployment definition file. Incase you run the deployment definiation file then old version will be returned.
 
+Different between Recreate and Rolling update
+
+
+- While using Recreate upgrade strategy, the replica set will be scaled down to 0 from the number of replica's mentioned then it will bring back to the replica's. This way there is guaranteed downtime.
+
+- While using Rolling update strategy, the replica set will be scaled down and up in parallel. There is no downtime expected in this strategy.
+
+Upgrades:
+
+- In Kubernetes Deployment when you are upgrading the application, the deployment will create 2 replica sets. 
+- The second replicaset will be empty and when ever update is completed the updated container will be moved onto 2nd replicate to keep the app up and available for users.
+- It can be seen thru -> kubectl get replicasets
+
+Rollback:
+- Incase the app dint worked post upgrade then we will need to roll back the changes.
+- Using below command, the roll back will be smooth and without downtime one by one container will be rolled back.
+-> kubectl rollout undo deployment/"deployment name"
 
 
 
