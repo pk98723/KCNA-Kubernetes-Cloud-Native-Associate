@@ -478,5 +478,12 @@ We can also use object configuration files using object such as
 - Deleting an object using create command
 -> kubectl delete -f nginx.yaml
 
-- In Kubernates, Declarative way of commands are:
+- In Kubernates, Declarative way is to create a set of files
+defines the expected state of the application and services on a Kubernetes cluster.
+
+Commands
+
+- The apply command will do creating, editing, deleting from the given inputs
+-> kubectl apply -f nginx.yaml
+
 
