@@ -438,3 +438,45 @@ Port: 8080
 Path: /
 Code: GIT Repo - X
 Ex: Anible/Pupet/Chef/Terraform are Declarative examples
+
+
+- What if a resource you are trying to deploy is already exist, then using declarative approach it can be differenciated like:
+
+VM Name:  web-server
+Package: nginx
+----------------------------
+VM Name: web-server
+Package: nginx:1.18
+
+- In Kubernates, Imperative way of commands are:
+
+- To run an image
+kubectl run --image=nginx nginx
+
+- To create a deployment with image name nginx
+-> kubectl create deployment --image=nginx nginx
+
+- To create a service by exposing the deployment
+-> kubectl expose deployment nginx --port 80
+
+- To edit a deployment with the name nginx
+-> kubectl edit deployment nginx
+
+- To scale a replicas by 5 in nginx deployment
+-> kubectl scale deployment nginx --replicas=5
+
+- To set an image version from nginx to nginx:1.18
+-> kubectl set image deployment nginx nginx=nginx:1.18
+
+We can also use object configuration files using object such as 
+- Creating an object using create command
+-> kubectl create -f nginx.yaml
+
+- Replcing an object using replace command
+-> kubectl replace -f nginx.yaml
+
+- Deleting an object using create command
+-> kubectl delete -f nginx.yaml
+
+- In Kubernates, Declarative way of commands are:
+
