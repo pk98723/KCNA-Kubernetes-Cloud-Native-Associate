@@ -486,4 +486,21 @@ Commands
 - The apply command will do creating, editing, deleting from the given inputs
 -> kubectl apply -f nginx.yaml
 
+**Imperative Object Config Files**
+
+Create Objects:
+
+kunectl create -f nginx.files
+  -  To create the file
+
+
+Update Objects:
+
+kubectl edit -f nginx.yaml
+  -  This command will open a editable yaml file from Kubernetes memory with some additional lines of code.
+
+kubectl replace -f nginx.yaml
+  -  Once edit command is ran to replace some portal of code then run replace command to replace the nginx.yaml file with new features.
+
+Kubectl replace - force -f nginx.yaml
 
