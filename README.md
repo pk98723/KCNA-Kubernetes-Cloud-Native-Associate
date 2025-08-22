@@ -603,3 +603,20 @@ metadata:
 - If you want to create the pods in only one namespace (assuming there are other namespaces), then use below command to set context
 -> kubectl config set-context $(kubectl config current-context) --namespace=dev
 
+  Resource Quota
+
+- It is better to limit the quota per namespace to keep a cap on the deplyments happening.
+- Example yaml file:
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: computer-quota
+  namespace: dev
+specs:
+  hard:
+    pods: "10"
+    requests.cpu: "4"
+    requests.memory: 5Gi
+
+
