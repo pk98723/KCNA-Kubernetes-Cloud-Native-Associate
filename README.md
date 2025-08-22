@@ -508,3 +508,19 @@ Kubectl replace - force -f nginx.yaml
 
 kubectl apply -f nginx.yaml
   -  This command will simply run the nginx file incase there are any changes to it.
+
+**Kubectl Apply Command**
+
+Local file (Yml)
+ - This is the actual configuration file user writes
+
+
+Last applied Configuration (in Json format)
+ - This the last saved configuration file incase we need to refer what was applied lastly
+
+
+Kubernetes (Yml)
+ - This is the configuration file stored in Kubernetes with some additiona fields
+
+
+
