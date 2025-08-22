@@ -559,3 +559,15 @@ MySQL.connect("db-service.dev.svc.cluster.local")
 2. dev is namespace
 3. svc is service
 4. cluster.local is domain
+
+Kubectl commands for Namespace
+
+- To list the pods for specific namespace, use below command, in below case we are fetching namespace 'kube-system' pod details
+-> Kubectl get pods --namespace=kube-system
+
+Ex:
+- Lets say we have used below command to create pods using pod-definition file then by default it will be created in "default namespace."
+-> kubectl create -f pod-definition.yml
+
+- If you want to create pods in specific namespace then use below command. In the below command we are trying to create the pods in namespace "dev".
+-> kubectl create -f pod.definition.yaml --namespace=dev
