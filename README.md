@@ -504,3 +504,7 @@ kubectl replace -f nginx.yaml
 
 Kubectl replace - force -f nginx.yaml
 
+**Declatative Object config files**
+
+kubectl apply -f nginx.yaml
+  -  This command will simply run the nginx file incase there are any changes to it.
