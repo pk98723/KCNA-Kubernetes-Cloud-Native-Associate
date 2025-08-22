@@ -518,9 +518,13 @@ Local file (Yml)
 Last applied Configuration (in Json format)
  - This the last saved configuration file incase we need to refer what was applied lastly
 
-
 Kubernetes (Yml)
  - This is the configuration file stored in Kubernetes with some additiona fields
 
+Annotations:
+ - This is the location in Live object configuration file (Kubernetes file) where the last applied configuration is stored in Json format.
 
+-  So when an apply command ran with configuration file updates then it will be compared with 
+ 1. config section in Live object configuration file in Kubernetes.
+ 2. Annotation section in Live object configuration file.
 
