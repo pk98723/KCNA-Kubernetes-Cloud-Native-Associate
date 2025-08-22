@@ -571,3 +571,35 @@ Ex:
 
 - If you want to create pods in specific namespace then use below command. In the below command we are trying to create the pods in namespace "dev".
 -> kubectl create -f pod.definition.yaml --namespace=dev
+
+
+  - If you dint want to mention the namespace in the kubectl command line then define it in the yaml under metadata section.
+Ex:
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: myapp-pod
+  namespace: dev
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+
+- If you want to create a new namespace
+Ex:
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+- Once above file is ready then simply run create command to create namespace
+
+-  If you want to create a namespace thru the kubectl command line then use:
+-> kubectl create namespace dev
+
+- If you want to create the pods in only one namespace (assuming there are other namespaces), then use below command to set context
+-> kubectl config set-context $(kubectl config current-context) --namespace=dev
+
