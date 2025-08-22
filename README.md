@@ -528,3 +528,34 @@ Annotations:
  1. config section in Live object configuration file in Kubernetes.
  2. Annotation section in Live object configuration file.
 
+
+Kubernetes Namespaces
+
+- So far we have created objects like Pods, services, deployments in cluster, what ever we are doing they are captured under a namespace called Default.
+- Default namespace is created automatically when a cluster is created. 
+
+- In order to have the DNS/Neworking resources are build to support the pods created will be by default created in kube-system namespace
+
+- In order to have the resources accessed by team or other members, resources specially built in kube-public namespace.
+
+- So by default, default namespace, kube-system namespace & kube-public namespace are built.
+
+
+Namespace - Isolations
+
+- We can create separate namespaces like resources groups in Azure environmental/app based and have different rules and restrictions to them for accessibility. Also a quota can be aligned to cap the number of resources to be built in a particular namespace.
+
+DNS ( Default Namespace)
+
+- to connect to a db service simply run -> mysql.connect("db-service")
+- to connect to a db service from one namespace to another.
+mysql.connect("db-service.dev.svc.cluster.local")
+
+
+- If we see closely the above command
+MySQL.connect("db-service.dev.svc.cluster.local")
+                
+1. db-service  is service name
+2. dev is namespace
+3. svc is service
+4. cluster.local is domain
