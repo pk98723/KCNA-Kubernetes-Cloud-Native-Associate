@@ -619,4 +619,31 @@ specs:
     requests.cpu: "4"
     requests.memory: 5Gi
 
+**Manual Scheduling**
+
+How scheduling works:
+- When deploying a pod via config file we don't specifically mention the nodeName on which the pod has to be deployed. Kubernetes will add it automatically.
+
+- The Scheduler will run thru all the pods config files and identifies on which file the nodeName is added in the file and pick it up to add the scheduling property on the node with the name nodeName property under spec section in yaml and binds pod to the node.
+
+If no scheduler:
+- Incase scheduler is not set then the pods will not be assigned to any node and kept in pending status.
+
+- To fix this, easy way is to input the nodeName details in the pod configuration file and bind the pod and node from the config file itself.
+
+- Incase we want to bind a node to existing pod then we need to create a binding config file with the pod and targeted node details
+
+apiVersion: v1
+kind: Binding
+metadata:
+  name: nginx
+target:
+  apiVersion: v1
+  kind: Node
+  name: "add the name of the nodeName wasnted to bin
+
+
+- Once above code is ready this needs to be converted into json format and post it to the Kubernetes to bind.
+
+format: curl --header "Content-Type:application/json" --request POST --data {"apiVersion": "v1", "kind": "Binding" ...} http://$SERVER/api/v1/namespaces/default/pods/$PODNAME/binding/
 
