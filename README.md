@@ -647,3 +647,46 @@ target:
 
 format: curl --header "Content-Type:application/json" --request POST --data {"apiVersion": "v1", "kind": "Binding" ...} http://$SERVER/api/v1/namespaces/default/pods/$PODNAME/binding/
 
+
+Labels and Selectors:
+
+- Are a standard method to group things together.
+
+- In Pod definition file, under metadata labels are defined.
+
+- To select the required a pod by filtering the selected labels, use:
+kubectl et pods --selector app=App1
+
+- Labels and Selectors use internally to connect with specific objects
+
+Ex: To create a replicaset consisting  3 different pods, we define labels at 2 places
+1. Under Metadata
+2. Under Template
+
+- The labels defined under metadata are of replicaset the labels defined under template are of pod.
+
+- To match the labels in the config file, we use selector section. See example config file below:
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: simple-webapp
+  labels:
+    app: App1
+    function: Front-end
+spec:
+  replicas: 3
+  selector:
+    matchLabels: 
+      app: App1
+   template:
+     metadata:
+       labels:
+         app: App1
+          function: Front-end
+       spec:
+         containers:
+         - name: simple-webapp
+           image: simple-webapp
+
+
