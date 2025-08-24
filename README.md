@@ -804,4 +804,121 @@ prefferedDuringSchedulingrequiredDuringExecution
 
 ⦁	For planned type, it is similar to available type but while execution, it is required to have labels in he pod to have the affinity impacted on that setting of the setup.
 
+Resource Limits:
+
+⦁	We can mention the amount of CPU and MEM needed for a container using Resource request.
+⦁	Ex:
+apiVersion:v1
+kind: Pod
+metadata:
+  name: app1
+  labels
+    name: app1
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      requests:
+        memory: "4Gi"
+        cpu: 2
+⦁	So when scheduler gets above request then it will search for 4 Gi mem and 2 cpu available in a node and accommodate this request.
+⦁	1 cpu = 1AWS vcps, 1 GCP cores, 1 Azure core, 1 Hyperthread
+⦁	 Note: we can alse et limit
+Ex:
+⦁	Ex:
+apiVersion:v1
+kind: Pod
+metadata:
+  name: app1
+  labels
+    name: app1
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      requests:
+        memory: "4Gi"
+        cpu: 2
+      limits:
+        memory: "2Gi"
+        cpu 2
+
+Exced Limits
+⦁	A container cannot use more CPU when limit is set on the config file for the Pod. Throtled
+⦁	However for Memory, it can use more memory than the limit, but if the usage is continuously trying to use more memory then it will get terminated and results in Out of Memory (OOM)
+
+
+Default Behaviour
+⦁	By default Kubernetes donot have any requests or limits set by default.
+⦁	It can use resources as much as they can but finally it will suffocate.
+
+Behaviour CPU
+⦁	No Requests, No Limits
+⦁	No Requests, Limits
+⦁	Requests, Limits,
+⦁	Requests, no Limits ( this is ideal setup)
+
+
+Behaviour Memory
+⦁	No Requests, No Limits
+⦁	No Requests, Limits
+⦁	Requests, Limits,
+⦁	Requests, no Limits -  In this scenario, we cannot throtle it so it will kill the pod with OOM
+
+Limit Range
+
+⦁	Yaml for CPU
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: CPU-resource-contraint
+spec
+  limits:
+  - default:
+      cpu: 500m
+    defaultRequests:
+      cpu: 500m
+    max:
+      cpu: "1"
+    min:
+      cpu: 100m
+    type: container 
+
+
+⦁	Yaml for Mem
+Limit Range
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: Memory-resource-contraint
+spec
+  limits:
+  - defult:
+      memory: 1Gi
+    defaultRequests:
+      memory: 1Gi
+    max:
+      memory: 1Gi
+    min:
+      memory: 500Mi
+    type: container
+
+⦁	Note: these are enforces when the pod is created, if you create or change the limit range it does not effect  existing pod, but it will effect the new pods.
+
+Resource Quotas
+⦁	We can set hard limitson  requests  and limits at namespace level.
+
+apiVersion:1
+kind: ResourceQuota
+metadata:  
+  name: my-resource
+spec:
+  hard:
+    requests.cpu:4
+    request.memory: 4Gi
+    limits.cpu:10
+    limits.memory:10Gi
+
 
