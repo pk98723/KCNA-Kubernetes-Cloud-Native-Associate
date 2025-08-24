@@ -804,6 +804,7 @@ prefferedDuringSchedulingrequiredDuringExecution
 
 ⦁	For planned type, it is similar to available type but while execution, it is required to have labels in he pod to have the affinity impacted on that setting of the setup.
 
+
 Resource Limits:
 
 ⦁	We can mention the amount of CPU and MEM needed for a container using Resource request.
@@ -922,3 +923,166 @@ spec:
     limits.memory:10Gi
 
 
+Daemonsets
+
+⦁	It ensures a copy of your pod added to the Daemonset node automatically.
+⦁	When the actual pod is deleted, then the saved pod will also gets deleted.
+⦁	Kube-proxy can be deployed as Daemonset.
+
+Ex:
+
+apiVersion:1
+kind: DaemonSet
+metadata:
+  name: monitoring-daemon
+spec:
+  selector:
+    matchLabels:
+      app: monitoring-agent
+  template:
+    metadata:
+      labels:
+        app: monitoring-agent
+    spec:
+      containers:
+      - name: monitoring-agent
+        image: monitoring-agent
+
+To see daemonset
+⦁	kubectl get daemonsets
+
+How does daemonset works
+
+
+Static PODs
+
+⦁	Static pods are deployed by Kubelet itself independent to the Kubernetes architecture (ApiServer)
+⦁	Kubelet only understand pods, so it can only create pods and it don't create replicaset/deployment etc.,
+⦁	So without pod definition file, kubelet cannot create any pod. So there is a directory /etc/Kubernetes/manifest where we can store definition files to use.
+⦁	Kubelet periodically checks this location and use the files to create the pod.
+⦁	Incase a pod corrupts, kubelet will start the pod and keep it live.
+How to configure the directory on kubelet  store file.
+1.	at --pod-manifest-path=/etc/Kubernetes/manifest in kubelet.service.
+2.	at --config=kubeconfig.yaml. And in config kubeconfig.yaml file add the path in below way
+staticPodPath: /etc/Kubernetes/manifest
+
+
+⦁	To view the static pod run below command
+-> docker ps
+
+⦁	kubelet will create pods in two ways
+1.	Thru static pod way described above
+2.	Thru API Server
+⦁	Well when a static pods are created by kubelet, then API server also know about this information so when you run kubectl get pods, the static pods details are derived.
+
+Use Case:
+⦁	On the master node, create the control planes components manifest files like controller manager.yaml,apiserver.yaml, etcd.yaml in the /api/Kubernetes/manifest location and rest is taken care by kubelet as pods on the cluster.
+⦁	Since it is a static pod, incase they are down, kubelet will automatically bring them up.
+
+Multiple Schedulers
+
+⦁	 need to understand from Shareef how it is achieved.
+
+Configuring Kubernetes Scheuler profiles
+
+⦁	Lets say we have a pod with cpu needing 10 vcores.
+⦁	Scheduler will check all the nodes where there is capacity to allocate this pod with 10 Vcores CPU.
+⦁	There is a flow to follow
+1.	Schedulling Queue
+2.	Filtering
+3.	Scoring
+4.	Binding
+
+
+⦁	These are called scheduling plugins
+1.	Scheduling Queue
+⦁	At this stage the pods will be waiting in queue to algin to a node based on the priority set.
+⦁	To set priority you need to create a priority class as shown below:
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high-priority
+value: 1000000
+globalDefault: false
+description: "this priority class should be used for XYZ pods only."
+⦁	So the above priority class should be added in the spec of the pod to give priority to the pod deployment which is in the queue.
+
+apiVersion:v1
+kind: Pod
+metadata:
+  name: simpleapp
+spec:
+  priorityClassName: high-priority
+  containers:
+  - name: simpleapp
+    image:simpleapp
+    resources:  
+      requests:
+        memory: "1Gi"
+        cpu: 10
+
+⦁	So in the above example the priority class name is defined so based on the priority the scheduler will put this pod deployment to queue.
+
+2. Filtering
+⦁	The phase where nodes that cannot run the with the resources will be filererd out.So it means, we need 10 CPU's and scheduler will check for the nodes where there is more than or equal to 10 CPU.
+
+3. Scoring
+⦁	This phase will check after consuming the 10 CPU's needed for the new node deployment how many will be left.
+⦁	Based on the available cpu's count the highest one will be picked up under Scoring phase.
+
+4. Binding
+⦁	This phase will bind the pod and node by executing the config yaml file.
+
+
+
+
+Scheduling Plugins
+
+Scheduling Queue  -  PrioritySort plugin
+Filtering - NodeResourceFit,NodeName,NodeUnschedulable plugin
+Scoring -  NodeResourceFit,ImageLocality plugin
+Binding - Defaultbinder plugin
+
+
+Extension Points
+
+⦁	Thru which the plugins are added to the pod deployment on the node
+
+1.	Schedulling Queue - queueSort
+2.	Filtering - prefilter, filter, postFilter
+3.	Scoring - preScore, score, reserve, permit
+4. Binding - prebind, bind, postBind
+
+Multi-scheduling files - Learn deeply
+
+
+
+
+Security Kubernetes Security Primitives
+
+1.	Authentication in Kubernetes cluster
+
+⦁	We have Admins to administer Cluster, we have developer to work on nodes thru cluster, we have endusers to access the application and we have other apps like Bots to integrate with apps on the nodes.
+⦁	Now lets see how the communication from all these sources will be securely done with Authentication.
+⦁	Lets consider Admins, developers and Bots for now as endusers authentication will not fall under K8s authentication.
+⦁	Basically there are two types of accounts - User accounts(Admins, developers) and Service Accounts (Bots)
+⦁	K8s cannot create user account as it relies on the input file
+Ex: Kubectl create user user1 -- X
+⦁	K8s can create service account 
+Ex: kubectl create serviceaccount SA1 
+
+User Accounts
+
+⦁	All user accounts are managed by Kube-apiserver
+⦁	There few auth mechanism to pass to Kube-apiserver:
+1.	Static Password File
+2. Static Token files
+3. Certificates
+Static Password File
+⦁	If we considered static password file mechanism, we need to create .csv file with username and password details and pass it to kube-apiserver.service file in below format and then restart kube-apiserver
+--basic-auth-file=user-details.csv
+⦁	As an alternative, you can specify the above command line in the pod definition file under spec of the containers to execute.
+
+Static Token files
+⦁	Similar to static password file mechanism, in token based auth, just replace the password with the token and pass it to kube-apiserver.service  file or add it in the pod manifest file as shown below
+--token-auth-file=user.detail.csv
