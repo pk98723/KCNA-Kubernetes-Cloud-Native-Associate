@@ -730,4 +730,80 @@ spec:
 ⦁	To know the if taints and toleration is applied on the masternode run the below command:
  - > kubectl describe node kubemaster | grep taint
 
+Node Selectors:
+
+⦁	Lets say we have 3 nodes with different resources configured in them from higher to lower.
+⦁	So if we create a pod, it can go onto any node from higher to lower configuration node.
+⦁	To specifically add pod which needs higher configuration node, we need to label the pod correctly. 
+⦁	Before you run the pod config file, run below one
+-> kubectl label nodes node-1 size=Large
+⦁	Now lets deploy pod with node selector
+
+apiVersion:v1
+kind: Pod
+metadata:
+  name: myapp
+spec:
+  containers:
+  - name: data-processor
+    image: data-processor
+
+   nodeSelector:  
+     size: Large
+⦁	now run kubectl create -f pod.yaml
+⦁	The pod will now be created in the node where there is label size: Large.
+⦁	Limitations for Node Selector
+-- Large or Medium ?
+-- Not small ?
+
+
+
+Node Affinity:
+⦁	This feature is used to place pod on specific node.
+⦁	Advanced node selectors like "or" and "not" are achieved from Node Affinity:
+Ex:
+apiVersion:v1
+kind: Pod
+metadata:
+  name: myapp
+spec:
+  containers:
+  - name: data-processor
+    image: data-processor
+
+  affinity:
+    nodeAffinity: 
+      requiredDuringSchedulingIgnoredDuringExecution: 
+        nodeSelectorTerms:
+        - matchExpressions: 
+          - key: size
+            operator: NotIn
+            values:
+            - small
+
+
+⦁	With above yaml, we can deploy a pod with affinity feature enabled to suffice the requirement, but what if there is no label with the name "size" added as part of key in the affinity section or what if the label size was modified by someone.
+
+Node Affinity Types
+
+Available:
+requiredDuringSchedulingIgnoredDuringExecution
+prefferedDuringSchedulingIgnoredDuringExecution
+
+Planned:
+requiredDuringSchedulingrequiredDuringExecution
+prefferedDuringSchedulingrequiredDuringExecution
+
+
+
+⦁	Lets break down "requiredDuringSchedulingIgnoredDuringExecution".
+ 1. Required During Scheduling means affinity section is looking for the label which is needed to bind the node and pod and if it is not present then the deployment will be failed. That means we need to use this unless you are binding a specific pod to a node.
+2. Ignored during execution means pods will be running irrespective of the label being removed from pod section which is mandate for affinity.
+⦁	Lets break down    "prefferedDuringSchedulingIgnoredDuringExecution".
+1.	Preffered During Scheduling means, affinity section is looking for the label which is needed to bind the node and pod and if the label is missing then scheduler will place the pod into any other node which is available.
+2.	Ignored during execution means pods will be running irrespective of the label being removed from pod section which is mandate for affinity.
+
+
+⦁	For planned type, it is similar to available type but while execution, it is required to have labels in he pod to have the affinity impacted on that setting of the setup.
+
 
