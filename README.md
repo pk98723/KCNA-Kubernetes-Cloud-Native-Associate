@@ -722,5 +722,9 @@ spec:
     value: "blue"
     effect: "NoSchedule"
 
+ - Note: Taints and Tolerations are not added to Master node because by default they are applied. So it is why there will be no pod is added onto Master node by scheduler even though it has space.
+⦁	To know the if taints and toleration is applied on the masternode run the below command:
+ - > kubectl describe node kubemaster | grep taint
+
 
 
