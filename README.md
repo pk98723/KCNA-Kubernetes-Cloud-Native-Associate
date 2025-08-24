@@ -690,3 +690,37 @@ spec:
            image: simple-webapp
 
 
+
+Taints and Toleration:
+
+⦁	Taints are set on nodes and tolerations are set on pods.
+⦁	If there are 4 pods and needs to be accommodated onto 3 nodes, then if you put taint on a node then the pod which has toleration can only connect to the node  which has taint on it by scheduler.
+Ex:
+-> Kubectl taint nodes node-name key=value: taint-effect
+⦁	The taint effect defines what would happen to the d if they donot tolerate the taints
+⦁	there are 3 taints effect
+1.NoSchedule  - Means pods will be not scheduled on the node
+2.PreferNoSchedule - system will try to avoid placing a pod on the node which is not guaranteed.
+3.NoExecute - Means new pods are not scheduled on the node and existing pods will be evicted if they are not tolerated.
+
+-> kubectl taint nodes node1 app=blue:noschedule
+
+
+pod-definition.yml
+
+apiVersion: v1
+kind:Pod
+metadata:
+  name: myapp
+spec:
+  containers:
+  - name: nginx container
+    image: nginx
+  tolerations:
+  - key: "app"
+    operator: "Equal"
+    value: "blue"
+    effect: "NoSchedule"
+
+
+
