@@ -795,14 +795,12 @@ requiredDuringSchedulingrequiredDuringExecution
 prefferedDuringSchedulingrequiredDuringExecution
 
 
-
 ⦁	Lets break down "requiredDuringSchedulingIgnoredDuringExecution".
  1. Required During Scheduling means affinity section is looking for the label which is needed to bind the node and pod and if it is not present then the deployment will be failed. That means we need to use this unless you are binding a specific pod to a node.
 2. Ignored during execution means pods will be running irrespective of the label being removed from pod section which is mandate for affinity.
 ⦁	Lets break down    "prefferedDuringSchedulingIgnoredDuringExecution".
 1.	Preffered During Scheduling means, affinity section is looking for the label which is needed to bind the node and pod and if the label is missing then scheduler will place the pod into any other node which is available.
 2.	Ignored during execution means pods will be running irrespective of the label being removed from pod section which is mandate for affinity.
-
 
 ⦁	For planned type, it is similar to available type but while execution, it is required to have labels in he pod to have the affinity impacted on that setting of the setup.
 
