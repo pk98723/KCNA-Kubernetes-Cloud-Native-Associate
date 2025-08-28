@@ -1344,5 +1344,15 @@ spec:
   imagePullSecrets:
    - name: regcred
 
+Network Policies
+⦁	Lets say we have a user trying to connect with a database. We have a web server serving the frontend (80)and an API server(Port 5000) linked to it to pass traffic onto backend Database severs (3600)
+⦁	Here the traffic from user to web interface is on port 80 is Ingress traffic.
+⦁	Traffic from wed interface to API server is Egress.
+⦁	Traffic to API server from web interface is ingress.
+⦁	Traffic from API server to DB is egress. 
+
+    -> Ingress        -> Egress, Ingress        -> Ingress
+User ----    80     -----     5000     -----     3306
+                                             <- Egress       
 
 
