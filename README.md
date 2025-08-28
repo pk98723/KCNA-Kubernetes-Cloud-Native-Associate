@@ -1213,3 +1213,136 @@ ABAC(Atribute Base access control)  -  Policy based
 RBAC(Role Base access control)  -  Role based (Secure)
 
 
+RBAC
+
+⦁	Config file
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+rules:
+  - apiGroup:
+⦁	User need to be binded with the roles created, to create that use:
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+subjects:
+ -  kind: user
+    name: -  dev-user
+    apiGroup: rbac.authorization.k8s.io
+
+ roleRef:
+  -  kind: Role
+     name: developer
+     apiGroup: rbac.authorization.K8s.io    
+
+⦁	To view the create roles
+-> kubectl get roles
+⦁	To view the role bindings
+-> kubectl get rolebindings
+⦁	To understand the access of a user
+-> kubectl describe role developer
+
+⦁	How to check access to admin a namespace/pod/node
+-> kubectl auth can-i create deployments/ delete nodes etc.,
+
+Cluster Roles:
+
+⦁	In Namespace we can only create pod, replicasets, jobs, deployments, services, secrets, roles, rolebinding, configmas, PVC.
+⦁	In Cluster Scoped, we can create only nodes, PV, clusterroles, clusterolebings, certificatessigningrequests, namespaces.
+
+⦁	To view
+-> kubectl api-resources --namespaced=true
+
+⦁	CLuster roles ae norman roles created on cluster scoped resources.
+⦁	cluster role def file:
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+rules:
+ - apiGroups: [""]
+   resources: ["nodes"]
+   verbs: ["list", "get", "create", "delete"]
+subjects:
+ - kind: user
+   name: cluster-admin
+   apiGroup: rbac.authorization.k8s.io
+roleRef:
+   kind: ClusterRole
+   name: cluster-adminstrator
+   apiGroup: rbac.authorization.k8s.io
+
+⦁	There is no hard rule that resources arelimited to namespace roles. If we give a user clusterscoped role on a pod then he can access all the pods under all namespaces.
+
+ServiceAccounts:
+⦁	There are 2 types are accounts in k8s
+1.	User accounts (used by humans)
+2.	Service accounts (used by apps)
+
+⦁	To create a servce account, run
+-> kubectl create serviceaccount dashboard-sa
+In the above case the service account name is dashboard-sa
+
+⦁	To list the service account details, run
+-> kubectl get serviceaccount 
+
+⦁	To get more details about the service account, run
+-> kubectl describe serviceaccount dashboard-sa
+
+By default a token is generated for a service account which acts as a security feature.
+
+⦁	When a service account is created first it creates an account with the provided name and then it creates a token and then stores in Secret object.
+⦁	Secret object is then linked to service account.
+-> kubectl describe secret "token name"
+
+⦁	In simple words, create a service account, assign RBAC  and export the service account token o configure 3rd party application to authenticate to k8s api.
+⦁	But what if the 3rd party application is installed in K8s itself. The token itself will be mounted onto a volume on pod to host the application.
+
+⦁	By default a default service account will be created, also per namespace a service account will be created.
+⦁	Note: You cannot assign a new service account on a pod, you must delete and recreate the pod with new service account.
+⦁	Incase you want to delete the existing service account and create a new one, then you must specify it in the deployment and it will perform the rollout update to update the new service account.
+⦁	Kubernetes will automatically mounts the default service account on a pod. Incase you dont want to have the default service account, you need to specifically mention in config file of the pod.
+
+Image Security:
+
+⦁	image: nginx  - here nginx is the image name take from a repository from Docker.
+Total path will be: docker.io/library/nginx
+                    (Registry) (User) (Image/reporsitory)
+
+⦁	These are all publically available to access.
+Private Repository:
+⦁	We can also create our own/private repository to run applications.
+⦁	First login to private registry
+-> docker login private-registry.io
+
+⦁	Once login run the application in docker
+-> docker run private-registry.io/apps/internal-app
+
+⦁	Now replace the image name in the pod yaml file
+
+apiVersion: v1
+kind: Pod
+Metadata:
+  name: nginx-pod
+spec:
+  containers:
+  - name: nginx
+    image: private-registry.io/apps/internal-app
+
+⦁	Now what about the creds to login to private registry to retrive the image on the docker runtime to the worker nodes.
+-> kubectl create secret docker-registry regcred -- docker-server=private-registry.io  --docker-username= registry-user --docker-password=registry-password --docker-email=registry-username@org.com.
+
+then pass the secret name regcred to the above pod yaml file
+
+apiVersion: v1
+kind: Pod
+Metadata:
+  name: nginx-pod
+spec:
+  containers:
+  - name: nginx
+    image: private-registry.io/apps/internal-app
+  imagePullSecrets:
+   - name: regcred
+
+
+
