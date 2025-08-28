@@ -1086,3 +1086,115 @@ Static Password File
 Static Token files
 ⦁	Similar to static password file mechanism, in token based auth, just replace the password with the token and pass it to kube-apiserver.service  file or add it in the pod manifest file as shown below
 --token-auth-file=user.detail.csv
+
+
+KubeConfig
+
+By default kubeconfig file will be kep in $HOME/.kube/config.
+
+The config file has 3 parts
+CLusters
+COntexts
+Users
+
+⦁	In Clusters arevarious kubernetes cluster where we will have access to. Ex: Develpment, Production, Google, AWS, Azure etc.,
+⦁	In Users, there are various account to access the clusers. Ex: Admin, Dev User, Prod User.
+⦁	In Contexts, Clusters and contexts are binded. Ex: Admin@production, Dev@Google. It means Admin account is being used to access production environment. This way you don't need to specify user certificates, server address in each and every kube control command.
+⦁	Kube config file:
+
+apiVersion: v1
+kind: Config
+current-context: my-kube-admin@my-kube-playground
+Clusters
+  - name: my-kube-playground
+    cluster:
+      certificate-authority: ca.crt
+      server: https://my-kube-playground:6443
+Contexts:
+  - name: my-kube-admin@my-kube-playground
+    context:
+      cluster:my-kube-playground
+      user: my-kube-admin
+users:
+  - name: my-kube-admin
+    user:
+      client-certificate: admin.crt
+      client-key: admin.key
+
+⦁	To view the current config file details run
+-> kubectl config view
+⦁	Incase you dint mention any current config to use then by default it will pick the config mentioned in $HOME/.kube/config location. 
+
+⦁	To change the current context incase you want to use prod-user@production config then simply run
+-> kubectl config user-context prod-user@production
+
+⦁	The above change will reflect under current-context location in the config file
+
+apiVersion: v1
+kind: Config
+current-context: prod-user@production
+Clusters
+  - name: production
+    cluster:
+      certificate-authority: ca.crt
+      server: https://my-kube-playground:6443
+Contexts:
+  - name: prod-user@production
+    context:
+      cluster:production
+      user: mprod-user
+users:
+  - name: prod-user
+    user:
+      client-certificate: admin.crt
+      client-key: admin.key
+
+
+API GROUPS
+⦁	There are 2 types of API's
+1.	Core group (/v1)
+2.	Name group (/apis)
+
+⦁	The core groups is where all functionality exisits like namespaces, config maps etc.,
+⦁	The Name groups are more organized and going forward name groups will be used.
+
+Named (apis)
+|
+|
+\/
+API Groups
+ - /apps
+ - /extensions
+ - /networking.k8s.io
+ - /storage.k8s.io
+ - /authentication.k8s.io
+ - /cerificates.k8s.io
+|
+|
+\/
+/apps
+|
+|
+\/
+/v1
+|
+|
+\/
+Resources
+ - /deployments
+ - /replicasets
+ - /statefulsets
+|
+|
+\/
+Verbs
+ - list
+ - get
+ - create
+ - delete
+ - update
+ - watch
+
+⦁	So finally, all resources in Kubernetes are categorized into API groups at the top level we have core API group and named API group. Under the named API group we have one for each section and under the each section we have different resources has a set of associated options known as verbs
+
+
