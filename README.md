@@ -1197,4 +1197,19 @@ Verbs
 
 ⦁	So finally, all resources in Kubernetes are categorized into API groups at the top level we have core API group and named API group. Under the named API group we have one for each section and under the each section we have different resources has a set of associated options known as verbs
 
+Authorization
+⦁	In general authorization is used to allow a user/ service accounts to administrate.
+⦁	There are 4 types of mehanisms
+1.	Node
+2.	ABAC
+3.	RBAC
+4.	Webhook
+⦁	Let take a look at Node
+
+⦁	As we know kube API server is accessed by users for management purpose. Any opertional activity done by Kubelet like Read or write on  serices, endpoint, Nodes, Pods, Node status, Pod status etc., the information is passed to kube API server, These requests are organised by Node Authorizer.
+⦁	Any request comes with Node Authorizer which are under System Nodes groups are granted the previlages.
+
+ABAC(Atribute Base access control)  -  Policy based 
+RBAC(Role Base access control)  -  Role based (Secure)
+
 
