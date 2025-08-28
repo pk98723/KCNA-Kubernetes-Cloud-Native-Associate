@@ -1356,3 +1356,198 @@ User ----    80     -----     5000     -----     3306
                                              <- Egress       
 
 
+Cluster Networking:
+
+Ports to be open on Master Node:
+⦁	Port 6443 for Kube API server
+⦁	Port 2379 for etcd
+⦁	Port 2380 for etcd client
+⦁	Port 10250 for Kubelet API
+⦁	Port 10251 for Kubescheduler
+⦁	Port 10252 for Kube controller manager
+
+Ports to be open on Worker Node:
+⦁	Port 10250 for Kubelet API
+⦁	30000-32767 for NodePort Services
+
+
+
+Pod Networking:
+⦁	Lets say we have 3 nodes connected thru a LAN and there 5 pods per node and we know 3 nodes are in contact thru LAN but how the pods will be communicating with each other.
+⦁	As of today there is no build in sollution for it, we need to implement networking sollution.
+⦁	K8s expects every POD should have an IP address
+⦁	Every pod should be able to communication with every other POD in the same node
+⦁	Every pod should be able to communicate with every other POD on other nodes without NAT.
+⦁	There many 3rd party tools whch will help with such requirement like weaveworks, flannel, cilium, vmware NSX etc.,
+
+⦁	But lets try to build this internally
+ Lets say we have 3 node clusters and give the Ip address as 
+node1 192.168.1.11
+node2 192.168.1.12
+node3 192.168.1.13
+
+When containers are created, K8s enables network namespaces for them to attach these namespaces to a network.
+
+Bridge networks will help to create the network on each node  with following commands
+
+-> ip link add v-net-0 type bridge
+
+And bring the network up
+
+-> ip link set dev v-net-0 up
+
+Now add the ip to the nodes 
+
+-> ip addr add 10.244.1.1/24 dev v-net-0
+-> ip addr add 10.244.2.1/24 dev v-net-0
+-> ip addr add 10.244.3.1/24 dev v-net-0
+
+
+Now lets write a script to assign the IP;s to the individual pod. Note: we need to specify the pod everytime and run the script to get the IP added.
+
+net-script.sh
+
+# Create Veth pair
+ip link add 10.244.1.2
+
+# Attach veth pair
+ip link set
+ip link set
+
+# assign IP Address
+ip -n <namespace> addr add
+ip -n <namespace> route add
+
+# Bring up interface
+ip -n <namespace> link set
+
+
+After running above scripts, we will assign the IP's individually to the PODs. Now lets try to communicate from one pod of the Node to another pod of another node.
+
+Obviously it will fail, because the communicate was inline between the nodes only but we need to enable the comms between the bridgenetwork and Node then only the comms will be enabled.
+
+ip route add <pod ip> via <node ip or gateway ip>
+
+
+Container Network Interface (CNI)
+As per CNI the scrip should have a ADD section and a DEL section.
+
+
+CNI in Kubernetes
+
+Pre-reqs:
+⦁	Network Namespaces in Linux
+⦁	Networking in Docker
+⦁	Why and what is container network interface (CNI)
+⦁	CNI plugins
+
+Defination:
+⦁	Containers Runtime must create network namespace
+⦁	Identify network the container must attach to
+⦁	Container Runtime to invoke Network Plugin (bridge) when container is ADDed
+⦁	Container Runtime to invoke Network Plugin (bridge) when container is DELeted
+⦁	JSON format of the Network Confirguration
+
+
+Configuring CNI
+⦁	CNI plugin is configured in kubelet service.
+
+
+DNS n Kubernetes
+
+What names are assigned to what objects
+Service DNS records
+POD DNS records
+
+
+⦁	By default the DNS is setup within Kubernetes called KubeDNS.
+⦁	Lets assume we have 2 nodes, on first node we have one pod and in another node we have a service and a pod.
+⦁	Consider 1st pod name is dev and 2nd pod have is web and service name is web-service.
+⦁	Incase from dev pod, if web-service has to be accessed them in DNS a record will be created with name web-server, under namespace apps(assuming the service is in this namespace), type as svc, root as cluster.local.
+⦁	So the URL is https://www.web-service.apps.svc.cluster.local.
+
+⦁	similarly for the pods the url would be https://www.<ip address>.namespace.svc.cluser.local.
+
+
+Ingress
+
+⦁	I have a URL built to be access for the online store gudies and the url is http://myonline.co on port 32000
+The tradditional method for internal traffic is to put a proxy between the pod and the online URL to make sure the URL is being accessed with out IP in the URL as the mapping of the IP happens in the proxy itself.
+
+⦁	If the same url has a request to be accessed online them we will be putting a loadbalancer with a public IP on it.
+
+
+Ingress Controller and Ingress Resource
+
+⦁	Ingress controller is not a defaultly installed on k8s, it needs to be configured. 
+⦁	Ingress controller is a loadbalancer supported by K8s, it can be Google Cloud Engine, Nginx, Contour, HA Proxy etc are few examples.
+⦁	To configure INgress controller, it has set of config files to be created:
+
+
+1.	deployment.yaml
+apiVersion: extensions/v1betal
+kind: Deployment
+metadata:
+  name: nginx-ingress-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: nginx-ingress
+   template:
+     metadata:
+       labels:
+         name: nginx-ingress
+     spec:
+       containers:
+         - name: nginx-ingress-controller
+           image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.21.0
+
+        args:
+          - /nginx-ingress-controller
+          - --configmap=$(POD_NAMESPACE)/nginx-configuration
+        env:
+          - name: POD-NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+           - name: POD_NAMESPACE
+             valueFrom:
+               fieldRef:
+                 fieldPath: metadata.namespace
+         ports:
+           - name: http
+             containerPort: 80
+           - name: https
+             containerPort: 443   
+
+
+ 2. service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ingress
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  - port: 443
+    targetPort: 443
+    protocol: TCP
+    name: https
+  selector:
+    name: nginx-ingress
+
+3. Service Account
+
+apiVersion: V1
+kind: ServiceAccount
+metadata:
+  name: nginx-ingress-serviceaccount
+
+
+The bottom line is we need a deployment config to deploy the inggress controller, a service to expose it on http and https, a config map to feed configuration data and right authentication to access the application.
+
