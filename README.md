@@ -1551,3 +1551,63 @@ metadata:
 
 The bottom line is we need a deployment config to deploy the inggress controller, a service to expose it on http and https, a config map to feed configuration data and right authentication to access the application.
 
+
+Ingress Resource
+
+⦁	Ingress Resource is nothing but configuring backend servers with the port and the traffics on which it listens.
+
+config:
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-wear
+spec:
+  backend:
+    serviceName: wear-service
+    servicePort: 80
+
+
+⦁	Here the config file can be written in two types:
+
+With the different paths
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+spec:
+ rules:
+ - https:
+     paths:
+     - path: /wear
+       backend:
+         serviceName: wear-service
+         servicePort: 80
+
+     - path: /watch
+       backend:
+         serviceName: watch-service
+         servicePort: 80
+
+
+With the different rules
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+spec:
+ rules:
+ - host: wear.my-online-store.com
+   http:
+     paths:
+      backend:
+         serviceName: wear-service
+         servicePort: 80
+ - host: watch.my-online-store.com
+   http:
+     paths:
+      backend:
+         serviceName: watch-service
+         servicePort: 80
+
