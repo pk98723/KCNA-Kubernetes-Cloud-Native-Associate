@@ -1610,4 +1610,144 @@ spec:
       backend:
          serviceName: watch-service
          servicePort: 80
+Kubernetes Services:
+
+⦁	Pods are ephemeral in nature so if 2 pods from frontend tries to connect to 3 pods from backend. Every time if a pod fails, a new pod will be built with new IP. 
+⦁	So K8s intruduced backend service which has a constant IP with labels on it matching to the pods it should be connecting.
+⦁	There are 3 types are services
+
+NodePort - If application has to be accessible outside of the cluster then NodePort service should be created. It creates a predefined ports on the cluster to be accessible out of cluster.
+
+
+Cluster IP  - It is a default service, this is an internal only service that means it is created only to communicate between application within the cluster.
+
+
+LoadBalancer - It is supported by few cloud providers for communication online.
+
+
+
+Sidecars
+⦁	Additional containers that supports the main containers are called sidecar containers.
+⦁	Sidecars are responsible for log shipping, Monitoring, File loading.
+⦁	They are small in size.
+⦁	Def file"
+containers:
+ - name: nginx-container
+   image: nginx
+   volumeMounts:
+   - name: shared-data
+     mountPath: /usr/share/nginx/html
+ - name: sidecar-container
+   image: fluent/fluentd
+   volumeMounts:
+   - name: shared-data
+     mountPath: /pod-data
+
+Envoy
+⦁	It is one of the common proxy
+
+Service Mesh
+⦁	It is a dedicated and configurable infra layer that handles the communication between services without having to change the code in a microservice architecture.
+⦁	It is responsible for Traffic Management, Security, Observability, Service Discovery
+
+
+Storage:
+
+Storage in Docker
+
+⦁	When you install docker, it will create a location at /var/lib/docker location where docker stores aufs, containers, image, volumes.
+Dockers Layered architecture:
+
+
+docker file 1
+
+FROM Ubuntu
+RUN apt-get update && apt-get -y install python
+RUN pip install flask flask-mysql
+COPY . /opt/source-code
+ENTRYPOINT FLASK_APP=/opt/source-code/app.py flask run
+
+⦁	From the above line of code, we understand that 
+Layer1: Base Ubuntu Layer
+Layer2: Changes in apt packages
+Layer3: Changes in pip packages
+Layer4: Source code
+Layer5: Update Entrypoint
+
+
+⦁	And when we execute docker build Dockerfile -t "location/app file name", all 5 layers are executed and each layer occupies certain value in the storage.
+
+⦁	Lets say we have another docker file with similar feature 
+
+docker file 2
+
+FROM Ubuntu
+RUN apt-get update && apt-get -y install python
+RUN pip install flask flask-mysql
+COPY app2.py /opt/source-code
+ENTRYPOINT FLASK_APP=/opt/source-code/app2.py flask run
+
+⦁	When we run above code using 
+-> docker build Dockerfile2 -t "location/app file name", we see first 3 layers are common from docker file 1, so docker will not run the first 3 and takes it from the cache to save the space occupied and only run the last 2 layers as we are installing app2.
+
+
+⦁	Once we run the above 5 layers, an image will be created in image layer with Read only format.
+⦁	On top of it, a container layer sits with Read Write format.
+⦁	That means image in Image Layers section cannot be edited, to edit it, we need to push or copy it onto container layer and do the modifications this is called COPY-ON-WRTIE.
+
+Volumes
+
+⦁	From previous example we understood that once the image is pulled into container for working, and for any reason container got deleted, everything is gone.
+⦁	So we have concept called volumes, here it acts like a bridge between the image and container.
+⦁	When ever a container is created with the image, the data will be stored in volume location(data_volumes), that means even then a container is deleted, you still have the data. This is called volume mounting.
+⦁	Default location of vulmes is /var/lib/docker -> volumes -> data_volume.
+⦁	The command to enable this mechanism to store data in data_volumes is
+-> docker run -v data_volume:/var/lib/mysql mysql
+here we are makin data_volume available to have sql data/image stored from location /var/lib/mysql
+
+⦁	Incase we dint create any data_volume location then what happens
+-> docker run -v data_volume2:/var/lib/mysql mysql
+If we run above command, then by default, data_volume2 is created and start storing the data.
+
+⦁	What if we have another location that sql data has to be stored no in data_volumes then we need to bind the location of the mysql  in /var/lib/mysql to the destination location using the command:
+⦁	->docker run -v /data/mysql:/var/lib/mysql mysql
+here /data/mysql is the destination location where my sql wants to store the data. This type of storing the data is called bind mounting.
+
+Bottom line is volume mounting mount the volume from volumes directory where as bind mounting mount a directory from any location within the docker host.
+
+The new way to run command replacing -v is
+-> docker run \ --mount type=bind,source=/data/mysql,target=/var/lib/mysql2 mysql
+
+So Docker uses storage drivers to work in layered architecture.
+Ex: Storage drivers
+
+AUFS
+ZFS
+BTRFS
+Device Mapper
+Overlay
+Overlay2
+
+Volume Drivers Plugins:
+⦁	To persists storage we need volumes and they are handled by volume drivers plugins and default volume plugin in "Local"
+⦁	There are many other 3rd party volume pugins allows you to store your volumes like Azure File Storage, Convoy, Digital Ocean, rexray, netapp etc.,
+
+⦁	When you run below, it means we are asking rexray/ebs to provision a volume from ebs and mount the mysql data in container in AWS EBS. Incase the container is deleted, you data is safe in the cloud
+-> docker run -it --name mysql --voume-driver rexray/ebs --mount src=ebs-vol,target=/var/lib/mysql mysql
+
+Container Storage Interface:
+⦁	Is a plugin which kubernetes interact with storage or volume supported 3rd party sollutions like Amazon EBS, portworx, DELL EMC etc.,
+⦁	When the plugin is connect to kubernetes, the RPC (remote call procedures) will be enabled that means if from kubernetes there is an instruction to provision a new volume/delete a volume, then they should be executed at 3rd party sollution and should return the results to kubernetes.
+
+
+
+Basically there are 3 interfaces:
+Container Runtime Interface
+⦁	It is an interface to provide runtime on kubernetes by using images from the 3rd party like Docker, Rkt etc 
+Container Network Interface
+⦁	It is an interface to provides/connects the network between kubernestes and 3rd party 
+Container Storage Interface
+⦁	It is an interface which provides to store data onto 3rd party apps and cloud like Azure, AWS EBS, DELL EMC etc.,
+
+
 
