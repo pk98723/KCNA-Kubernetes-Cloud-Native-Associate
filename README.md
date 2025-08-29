@@ -1749,5 +1749,75 @@ Container Network Interface
 Container Storage Interface
 ⦁	It is an interface which provides to store data onto 3rd party apps and cloud like Azure, AWS EBS, DELL EMC etc.,
 
+Persistent Volumes:
+ - These are the volumes created at node/cluster level.  
+ - These volumes are like disk on the VM, lets say we have 1 TB of disk created and we needed a partision of300 GB from it for other purposes, we claim it as PVC. Once the work is done and 300GB space will be added back to PV.
+
+When a PVC is deleted by default PV it is set to retain
+ - Retain -  it will be retained by default
+ - Delete  -  it will be deleted
+ - Recycle  - it will be scapped before it is deleted
+
+
+⦁	PV Def file:
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-vol1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 500Mi
+  gcePersistentDisk:
+    pdName: pd-disk
+    fsType: ext4
+
+
+⦁	PVC Def file:
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-vol1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+
+⦁	pod-definition file
+apiVersion: v1
+kind: Pod
+metadata:
+  name:randome-number-generator
+spec:
+  containers:
+  - image: alpine
+    name: alpine
+    command: ["/bin/sh", "-c"]
+    args: ["shuf -i o-100 -n 1 >> /opt/number.out;"]
+    volumeMounts:
+    - mountPath: /opt
+      name: data-volume
+    volumes:
+    - name: data-volume
+      persistentVolumeClaim:
+        claimName: myclaim
+ 
+Storage Classes:
+
+⦁	Generally to have the PV created, we need to create a virtual storage somewhere in cloud or any 3rd party tools to enable PV to store the data onto them prior to PV gets created.
+⦁	So to overcome that and create the virtual storage disk/volume during the provision of PVC on a pod we use storage class.
+⦁	Storage class will bind the PVC and cloud storage or 3rd party storage.
+⦁	
+apiVersion: storage.k8s.io.v1
+kind: StorageClass
+metadata:
+  name: google-storage
+provisioner: kubernetes.io/gce=pd
+parameters:
+  type: pd-standard
+  replication-type: none
 
 
