@@ -1818,6 +1818,6 @@ metadata:
 provisioner: kubernetes.io/gce=pd
 parameters:
   type: pd-standard
-  replication-type: none
+  replication-type: none 
 
 
